@@ -339,7 +339,8 @@ export default function IprForm() {
   useEffect(() => {
     const load = async () => {
       try {
-        const profileRes = await getMyProfile();
+        const employeeId = getStoredEmployeeId();
+        const profileRes = await getEmployeeById(employeeId);
         setProfile(profileRes.data);
 
         if (!isNew) {
