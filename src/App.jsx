@@ -1,0 +1,75 @@
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import ProtectedRoute from './components/ProtectedRoute';
+import Login from './pages/Login';
+import EmployeeDashboard from './pages/EmployeeDashboard';
+import IprForm from './pages/IprForm';
+import MySubmissions from './pages/MySubmissions';
+import PreviousReturns from './pages/PreviousReturns';
+import AdminDashboard from './pages/AdminDashboard';
+
+export default function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        {/* Public */}
+        <Route path="/" element={<Navigate to="/login" replace />} />
+        <Route path="/login" element={<Login />} />
+
+        {/* Employee routes */}
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute allowedRole="EMPLOYEE">
+              <EmployeeDashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/ipr/new"
+          element={
+            <ProtectedRoute allowedRole="EMPLOYEE">
+              <IprForm />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/ipr/:id"
+          element={
+            <ProtectedRoute allowedRole="EMPLOYEE">
+              <IprForm />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/submissions"
+          element={
+            <ProtectedRoute allowedRole="EMPLOYEE">
+              <MySubmissions />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/previous-returns"
+          element={
+            <ProtectedRoute allowedRole="EMPLOYEE">
+              <PreviousReturns />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Admin routes */}
+        <Route
+          path="/admin"
+          element={
+            <ProtectedRoute allowedRole="ADMIN">
+              <AdminDashboard />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Fallback */}
+        <Route path="*" element={<Navigate to="/login" replace />} />
+      </Routes>
+    </BrowserRouter>
+  );
+}
