@@ -2,7 +2,8 @@ import { useEffect, useState, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import Layout from '../components/Layout';
 import StatusBadge from '../components/StatusBadge';
-import { getMyProfile } from '../api/employeeApi';
+import { getEmployeeById } from '../api/employeeApi';
+import { getStoredEmployeeId } from '../utils/jwtHelper';
 import {
   getIprReturnById,
   createIprReturn,
