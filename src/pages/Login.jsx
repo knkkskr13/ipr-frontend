@@ -135,8 +135,9 @@ export default function Login() {
           </button>
         </form>
 
-        <p className="mt-6 text-center text-xs text-gray-400">
-          For login credentials, contact your department administrator.
+        <p className="mt-6 text-center text-sm text-gray-500">
+          New user?{' '}
+          <a href="/register" className="text-primary-600 hover:underline font-medium">Register here</a>
         </p>
       </div>
 

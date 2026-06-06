@@ -91,6 +91,9 @@ export default function Sidebar() {
             <NavLink to="/admin/employees" className={linkClass}>
               <IconUsers /><span>Employee List</span>
             </NavLink>
+            <NavLink to="/admin/ipr-returns" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}>
+              <IconList /><span>All IPR Returns</span>
+            </NavLink>
           </>
         ) : (
           <>

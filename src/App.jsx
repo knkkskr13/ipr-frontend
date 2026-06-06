@@ -1,11 +1,13 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import ProtectedRoute from './components/ProtectedRoute';
 import Login from './pages/Login';
+import Register from './pages/Register';
 import EmployeeDashboard from './pages/EmployeeDashboard';
 import IprForm from './pages/IprForm';
 import MySubmissions from './pages/MySubmissions';
 import PreviousReturns from './pages/PreviousReturns';
 import AdminDashboard from './pages/AdminDashboard';
+import AdminEmployees from './pages/AdminEmployees';
 
 export default function App() {
   return (
@@ -14,6 +16,7 @@ export default function App() {
         {/* Public */}
         <Route path="/" element={<Navigate to="/login" replace />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
 
         {/* Employee routes */}
         <Route
@@ -60,6 +63,22 @@ export default function App() {
         {/* Admin routes */}
         <Route
           path="/admin"
+          element={
+            <ProtectedRoute allowedRole="ADMIN">
+              <AdminDashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/employees"
+          element={
+            <ProtectedRoute allowedRole="ADMIN">
+              <AdminEmployees />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/ipr-returns"
           element={
             <ProtectedRoute allowedRole="ADMIN">
               <AdminDashboard />
