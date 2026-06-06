@@ -9,6 +9,8 @@ import PreviousReturns from './pages/PreviousReturns';
 import AdminDashboard from './pages/AdminDashboard';
 import AdminEmployees from './pages/AdminEmployees';
 import AdminIprView from './pages/AdminIprView';
+import MyProfile from './pages/MyProfile';
+import HelpSupport from './pages/HelpSupport';
 
 export default function App() {
   return (
@@ -20,6 +22,22 @@ export default function App() {
         <Route path="/register" element={<Register />} />
 
         {/* Employee routes */}
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute allowedRole="EMPLOYEE">
+              <MyProfile />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/help"
+          element={
+            <ProtectedRoute allowedRole="EMPLOYEE">
+              <HelpSupport />
+            </ProtectedRoute>
+          }
+        />
         <Route
           path="/dashboard"
           element={
