@@ -160,7 +160,7 @@ export default function AdminDashboard() {
                       <td className="table-cell">
                         <div className="flex items-center gap-2">
                           <button
-                            onClick={() => navigate(`/ipr/${ipr.iprId}`)}
+                            onClick={() => navigate(`/admin/ipr/${ipr.iprId}`)}
                             className="text-xs bg-gray-50 text-gray-700 border border-gray-200 hover:bg-gray-100 px-2.5 py-1 rounded font-medium"
                           >
                             View

@@ -8,6 +8,7 @@ import MySubmissions from './pages/MySubmissions';
 import PreviousReturns from './pages/PreviousReturns';
 import AdminDashboard from './pages/AdminDashboard';
 import AdminEmployees from './pages/AdminEmployees';
+import AdminIprView from './pages/AdminIprView';
 
 export default function App() {
   return (
@@ -82,6 +83,14 @@ export default function App() {
           element={
             <ProtectedRoute allowedRole="ADMIN">
               <AdminDashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/ipr/:id"
+          element={
+            <ProtectedRoute allowedRole="ADMIN">
+              <AdminIprView />
             </ProtectedRoute>
           }
         />
