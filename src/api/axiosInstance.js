@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const axiosInstance = axios.create({
-  baseURL: 'https://ipr-backend-cej0.onrender.com',
+  baseURL: 'https://ipr-backend-tfh6.onrender.com',
   headers: { 'Content-Type': 'application/json' },
 });
 
