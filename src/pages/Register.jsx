@@ -18,7 +18,7 @@ export default function Register() {
   const [loading, setLoading] = useState(false);
 
   // Load employee list so user can pick their record
-  // NOTE: /api/v1/employee is public or the register page calls it without auth
+  // NOTE: /api/v1/employee/get is public or the register page calls it without auth
   useEffect(() => {
     if (role === 'EMPLOYEE') {
       setLoadingEmployees(true);

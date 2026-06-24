@@ -1,3 +1,4 @@
+import { getActiveNotification } from '../api/notificationApi';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Layout from '../components/Layout';
@@ -13,6 +14,8 @@ export default function EmployeeDashboard() {
   const [iprReturns, setIprReturns] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [filingWindow, setFilingWindow] = useState(null);
+  const [windowLoading, setWindowLoading] = useState(true);
 
   useEffect(() => {
     const employeeId = getStoredEmployeeId();
@@ -21,6 +24,7 @@ export default function EmployeeDashboard() {
       setLoading(false);
       return;
     }
+
     const fetchData = async () => {
       try {
         const [empRes, iprRes] = await Promise.all([
@@ -37,6 +41,20 @@ export default function EmployeeDashboard() {
       }
     };
     fetchData();
+
+    // Check filing window — inside useEffect so it runs once on load
+    const checkFilingWindow = async () => {
+      try {
+        const res = await getActiveNotification();
+        setFilingWindow(res.data);
+      } catch {
+        setFilingWindow(null); // no active window
+      } finally {
+        setWindowLoading(false);
+      }
+    };
+    checkFilingWindow();
+
   }, []);
 
   const handleDelete = async (id) => {
@@ -52,21 +70,43 @@ export default function EmployeeDashboard() {
       <div className="flex items-center justify-center h-64">
         <svg className="animate-spin w-8 h-8 text-primary-600" fill="none" viewBox="0 0 24 24">
           <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" /></svg>
+          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+        </svg>
       </div>
     </Layout>
   );
 
   return (
     <Layout title="Employee Dashboard">
-      {error && <div className="mb-4 bg-red-50 border border-red-300 text-red-700 rounded-md px-4 py-3 text-sm">{error}</div>}
+      {error && (
+        <div className="mb-4 bg-red-50 border border-red-300 text-red-700 rounded-md px-4 py-3 text-sm">
+          {error}
+        </div>
+      )}
+
+      {/* Filing Window Banner */}
+      {!windowLoading && (
+        filingWindow ? (
+          <div className="mb-4 bg-blue-50 border border-blue-300 text-blue-800 rounded-md px-4 py-3 text-sm">
+            <p className="font-semibold">📢 {filingWindow.title}</p>
+            <p className="mt-1">{filingWindow.message}</p>
+            <p className="mt-1 text-xs text-blue-600">
+              Filing period: {filingWindow.startDate} to {filingWindow.endDate}
+            </p>
+          </div>
+        ) : (
+          <div className="mb-4 bg-yellow-50 border border-yellow-300 text-yellow-800 rounded-md px-4 py-3 text-sm">
+            ⚠️ IPR filing period is currently closed. You cannot create or submit IPR returns at this time.
+          </div>
+        )
+      )}
 
       <div className="mb-6">
         <h2 className="text-xl font-bold text-gray-800">Welcome, {employee?.name || 'Employee'}</h2>
         <p className="text-sm text-gray-500 mt-1">Immovable Property Return &mdash; Employee Portal</p>
       </div>
 
-      {/* Profile Card - uses exact Employee entity field names */}
+      {/* Profile Card */}
       {employee && (
         <div className="card p-5 mb-6">
           <h3 className="section-title">My Profile</h3>
@@ -91,16 +131,22 @@ export default function EmployeeDashboard() {
       <div className="card">
         <div className="flex items-center justify-between px-5 py-4 border-b border-gray-200">
           <h3 className="font-semibold text-gray-800">My IPR Returns</h3>
-          <button onClick={() => navigate('/ipr/new')} className="btn-primary flex items-center gap-2 text-sm">
+          <button
+            onClick={() => navigate('/ipr/new')}
+            disabled={!filingWindow}
+            className={`btn-primary flex items-center gap-2 text-sm ${!filingWindow ? 'opacity-50 cursor-not-allowed' : ''}`}>
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+            </svg>
             New IPR Return
           </button>
         </div>
+
         {iprReturns.length === 0 ? (
           <div className="text-center py-16 text-gray-400">
             <svg className="w-12 h-12 mx-auto mb-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
             <p className="text-sm">No IPR returns yet. Click "New IPR Return" to get started.</p>
           </div>
         ) : (

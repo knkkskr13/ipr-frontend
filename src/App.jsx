@@ -11,6 +11,7 @@ import AdminEmployees from './pages/AdminEmployees';
 import AdminIprView from './pages/AdminIprView';
 import MyProfile from './pages/MyProfile';
 import HelpSupport from './pages/HelpSupport';
+import AdminNotifications from './pages/AdminNotifications'; // ← NEW
 
 export default function App() {
   return (
@@ -112,6 +113,14 @@ export default function App() {
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/admin/notifications"
+          element={
+            <ProtectedRoute allowedRole="ADMIN">
+              <AdminNotifications />
+            </ProtectedRoute>
+          }
+        />  {/* ← NEW */}
 
         {/* Fallback */}
         <Route path="*" element={<Navigate to="/login" replace />} />

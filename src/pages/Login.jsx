@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { login } from '../api/authApi';
+import { getMe } from '../api/userApi';
 import { setStoredToken, decodeToken, clearStoredToken } from '../utils/jwtHelper';
-import axiosInstance from '../api/axiosInstance';
 
 export default function Login() {
   const navigate = useNavigate();
@@ -30,9 +30,9 @@ export default function Login() {
       localStorage.setItem('username', payload?.sub || username.trim());
 
       // Step 3: Fetch user details from backend to get role + employeeId
-      // Your backend needs a /api/v1/user/me endpoint that returns { id, username, role, employee: { id, name, ... } }
+      // Your backend needs a /api/v1/user/get/me endpoint that returns { id, username, role, employee: { id, name, ... } }
       try {
-        const userRes = await axiosInstance.get('/api/v1/user/me');
+        const userRes = await getMe();
         const userData = userRes.data;
         const role = (userData.role || 'EMPLOYEE').toUpperCase();
         localStorage.setItem('role', role);

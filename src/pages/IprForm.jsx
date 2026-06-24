@@ -22,6 +22,7 @@ import {
   updateDeclaration,
 } from '../api/declarationApi';
 import { formatDate, formatINR, toInputDate, todayISO } from '../utils/formatters';
+import { getActiveNotification } from '../api/notificationApi'; // ✅ NEW IMPORT
 
 // ─── helpers ────────────────────────────────────────────────────────────────
 const PROPERTY_TYPES = ['House', 'Land', 'Flat', 'Other Buildings'];
@@ -333,14 +334,24 @@ export default function IprForm() {
   const [error, setError] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
 
+  // ✅ NEW: Filing window states
+  const [filingWindow, setFilingWindow] = useState(null);
+  const [windowLoading, setWindowLoading] = useState(true);
+
   const isReadOnly = iprStatus === 'SUBMITTED' || iprStatus === 'APPROVED';
 
   // ── Load data ──────────────────────────────────────────────────────────────
   useEffect(() => {
     const load = async () => {
       try {
-        const employeeId = getStoredEmployeeId();
-        const profileRes = await getEmployeeById(employeeId);
+        // ✅ NEW: Check filing window alongside profile load
+        const [profileRes] = await Promise.all([
+          getEmployeeById(getStoredEmployeeId()),
+          getActiveNotification()
+            .then((res) => setFilingWindow(res.data))
+            .catch(() => setFilingWindow(null))
+            .finally(() => setWindowLoading(false)),
+        ]);
         setProfile(profileRes.data);
 
         if (!isNew) {
@@ -535,6 +546,36 @@ export default function IprForm() {
         </div>
         {iprId && <StatusBadge status={iprStatus} />}
       </div>
+
+      {/* ✅ NEW: Filing Window Banner */}
+      {!windowLoading && !isReadOnly && (
+        filingWindow ? (
+          <div className="mb-4 bg-green-50 border border-green-300 rounded-md px-4 py-3 flex items-start gap-3">
+            <svg className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <div>
+              <p className="text-sm font-semibold text-green-800">{filingWindow.title}</p>
+              <p className="text-xs text-green-700 mt-0.5">{filingWindow.message}</p>
+              <p className="text-xs text-green-600 mt-1">
+                Filing period: {formatDate(filingWindow.startDate)} — {formatDate(filingWindow.endDate)}
+              </p>
+            </div>
+          </div>
+        ) : (
+          <div className="mb-4 bg-red-50 border border-red-300 rounded-md px-4 py-3 flex items-start gap-3">
+            <svg className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
+            </svg>
+            <div>
+              <p className="text-sm font-semibold text-red-700">IPR Filing Window is Currently Closed</p>
+              <p className="text-xs text-red-600 mt-0.5">
+                You cannot save or submit your IPR return at this time. Please wait for the filing window to open.
+              </p>
+            </div>
+          </div>
+        )
+      )}
 
       {error && (
         <div className="mb-4 bg-red-50 border border-red-300 text-red-700 rounded-md px-4 py-3 text-sm">{error}</div>
@@ -833,8 +874,9 @@ export default function IprForm() {
           {!isReadOnly && (
             <button
               onClick={handleSaveDraft}
-              disabled={saving}
-              className="btn-secondary"
+              disabled={saving || !filingWindow} // ✅ disabled when window closed
+              className="btn-secondary disabled:opacity-50 disabled:cursor-not-allowed"
+              title={!filingWindow ? 'Filing window is closed' : ''}
             >
               {saving ? 'Saving...' : 'Save as Draft'}
             </button>
@@ -852,8 +894,9 @@ export default function IprForm() {
           {!isReadOnly && (
             <button
               onClick={handleSubmit}
-              disabled={!declChecked || submitting}
-              className="btn-success flex items-center gap-2"
+              disabled={!declChecked || submitting || !filingWindow} // ✅ disabled when window closed
+              className="btn-success flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              title={!filingWindow ? 'Filing window is closed' : ''}
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
