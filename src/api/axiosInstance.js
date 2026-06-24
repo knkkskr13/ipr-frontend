@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const axiosInstance = axios.create({
-  baseURL: 'http://localhost:8080',
+  baseURL: 'https://ipr-backend-cej0.onrender.com',
   headers: { 'Content-Type': 'application/json' },
 });
 
