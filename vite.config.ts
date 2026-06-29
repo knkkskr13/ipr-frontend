@@ -16,7 +16,7 @@ export default defineConfig({
       // Proxies to the Spring Boot backend (dev profile runs on 8081)
       // so the browser only ever talks to same-origin /api/v1/*
       '/api': {
-        target: 'http://localhost:8081',
+        target: 'https://ipr-backend-tfh6.onrender.com',
         changeOrigin: true,
       },
     },
